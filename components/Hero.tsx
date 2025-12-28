@@ -3,11 +3,13 @@ import React from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const Hero: React.FC = () => {
-  const scrollToBooking = () => {
-    const element = document.getElementById('booking');
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
     if (element) {
+      const rect = element.getBoundingClientRect();
+      const top = rect.top + window.scrollY - 80;
       window.scrollTo({
-        top: element.offsetTop - 80,
+        top,
         behavior: 'smooth'
       });
     }
@@ -39,13 +41,13 @@ const Hero: React.FC = () => {
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button 
-            onClick={scrollToBooking}
+            onClick={() => scrollToSection('booking')}
             className="px-10 py-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-full transition-all transform hover:scale-105 active:scale-95 shadow-xl"
           >
             Request a Catering Quote
           </button>
           <button 
-            onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => scrollToSection('services')}
             className="px-10 py-4 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md font-semibold rounded-full border border-white/30 transition-all"
           >
             View Our Services
@@ -54,8 +56,9 @@ const Hero: React.FC = () => {
       </div>
 
       <button 
-        onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+        onClick={() => scrollToSection('services')}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 hover:text-white transition-colors animate-bounce"
+        aria-label="Scroll to services"
       >
         <ChevronDown size={32} />
       </button>

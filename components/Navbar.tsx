@@ -27,9 +27,11 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const element = document.querySelector(href);
+    const id = href.substring(1);
+    const element = document.getElementById(id);
     if (element) {
-      const top = (element as HTMLElement).offsetTop - 80;
+      const rect = element.getBoundingClientRect();
+      const top = rect.top + window.scrollY - 80;
       window.scrollTo({ top, behavior: 'smooth' });
     }
     setIsMobileMenuOpen(false);
@@ -78,6 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSection }) => {
         <button 
           className="md:hidden"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle navigation menu"
         >
           {isMobileMenuOpen ? (
             <X className={isScrolled ? 'text-stone-900' : 'text-white'} />

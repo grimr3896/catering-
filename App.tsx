@@ -13,27 +13,27 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ['home', 'services', 'gallery', 'booking'];
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = window.scrollY + 150;
 
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetHeight = element.offsetHeight;
-
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+          const rect = element.getBoundingClientRect();
+          const absoluteTop = rect.top + window.scrollY;
+          
+          if (scrollPosition >= absoluteTop && scrollPosition < absoluteTop + element.offsetHeight) {
             setActiveSection(section);
           }
         }
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <div className="bg-stone-50 min-h-screen text-stone-900 selection:bg-amber-200 selection:text-amber-900">
+    <div className="bg-stone-50 min-h-screen text-stone-900 selection:bg-amber-200 selection:text-amber-900 scroll-smooth">
       <Navbar activeSection={activeSection} />
       
       <main>

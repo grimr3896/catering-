@@ -14,8 +14,9 @@ const Services: React.FC = () => {
 
       <div className="grid md:grid-cols-3 gap-12">
         {SERVICES.map((service) => {
-          // Dynamic icon lookup from lucide-react
-          const IconComponent = (Icons as any)[service.icon];
+          // Dynamic icon lookup from lucide-react with fallback to Utensils
+          const IconComponent = (Icons as any)[service.icon] || Icons.Utensils;
+          
           return (
             <div key={service.id} className="group relative">
               <div className="relative h-96 mb-6 overflow-hidden rounded-2xl shadow-lg">
@@ -26,7 +27,7 @@ const Services: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-stone-900/40 group-hover:bg-stone-900/20 transition-colors"></div>
                 <div className="absolute top-6 left-6 p-3 bg-white/90 backdrop-blur rounded-xl shadow-md">
-                  {IconComponent && <IconComponent className="w-6 h-6 text-amber-600" />}
+                  <IconComponent className="w-6 h-6 text-amber-600" />
                 </div>
               </div>
               
@@ -35,7 +36,10 @@ const Services: React.FC = () => {
                 {service.description}
               </p>
               
-              <button className="mt-4 text-amber-600 font-semibold text-sm tracking-widest uppercase flex items-center gap-2 hover:translate-x-1 transition-transform">
+              <button 
+                className="mt-4 text-amber-600 font-semibold text-sm tracking-widest uppercase flex items-center gap-2 hover:translate-x-1 transition-transform"
+                aria-label={`Learn more about ${service.title}`}
+              >
                 Explore More
                 <Icons.ArrowRight className="w-4 h-4" />
               </button>

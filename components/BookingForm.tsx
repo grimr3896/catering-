@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { Calendar, Users, UtensilsCrossed, Sparkles, Send, Loader2 } from 'lucide-react';
+import { Calendar, Users, UtensilsCrossed, Sparkles, Send, Loader2, AlertCircle } from 'lucide-react';
 import { EVENT_TYPES } from '../constants';
 import { generateMenuSuggestion } from '../services/geminiService';
 import { MenuSuggestion } from '../types';
 
 const BookingForm: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [menuResult, setMenuResult] = useState<MenuSuggestion | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,13 +25,23 @@ const BookingForm: React.FC = () => {
 
   const handleGenerateMenu = async () => {
     setIsGenerating(true);
-    const result = await generateMenuSuggestion(
-      formData.eventType,
-      formData.guests,
-      formData.message || "A luxury experience focusing on seasonal ingredients."
-    );
-    setMenuResult(result);
-    setIsGenerating(false);
+    setHasError(false);
+    try {
+      const result = await generateMenuSuggestion(
+        formData.eventType,
+        formData.guests,
+        formData.message || "A luxury experience focusing on seasonal ingredients."
+      );
+      if (result) {
+        setMenuResult(result);
+      } else {
+        setHasError(true);
+      }
+    } catch (err) {
+      setHasError(true);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -129,7 +140,7 @@ const BookingForm: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <button 
                 type="submit"
-                className="flex-1 bg-stone-900 text-white py-4 px-8 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-stone-800 transition-all"
+                className="flex-1 bg-stone-900 text-white py-4 px-8 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-stone-800 transition-all shadow-lg active:scale-[0.98]"
               >
                 <Send className="w-4 h-4" />
                 Submit Inquiry
@@ -138,7 +149,7 @@ const BookingForm: React.FC = () => {
                 type="button"
                 onClick={handleGenerateMenu}
                 disabled={isGenerating}
-                className="flex-1 bg-white border-2 border-amber-600 text-amber-600 py-4 px-8 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-amber-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-white border-2 border-amber-600 text-amber-600 py-4 px-8 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-amber-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm active:scale-[0.98]"
               >
                 {isGenerating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -152,13 +163,33 @@ const BookingForm: React.FC = () => {
         </div>
 
         {/* Right Side: AI Result Display */}
-        <div className="bg-stone-50 rounded-3xl p-8 md:p-12 border border-stone-200 min-h-[500px] flex flex-col justify-center relative overflow-hidden">
-          {menuResult ? (
+        <div className="bg-stone-50 rounded-3xl p-8 md:p-12 border border-stone-200 min-h-[500px] flex flex-col justify-center relative overflow-hidden shadow-inner">
+          {isGenerating ? (
+            <div className="text-center animate-pulse">
+              <Sparkles className="w-12 h-12 text-amber-600 mx-auto mb-4 animate-bounce" />
+              <h4 className="text-xl font-bold serif text-amber-900">Curating Your Menu...</h4>
+              <p className="text-stone-500 text-sm mt-2">Selecting seasonal ingredients and pairings.</p>
+            </div>
+          ) : hasError ? (
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <h4 className="text-xl font-bold serif text-stone-800">Connection Interrupted</h4>
+              <p className="text-stone-500 text-sm mt-2 max-w-xs mx-auto">
+                We couldn't connect to our AI designer. Please try again or submit your inquiry directly.
+              </p>
+              <button 
+                onClick={handleGenerateMenu}
+                className="mt-6 text-amber-600 font-bold uppercase tracking-widest text-xs hover:underline"
+              >
+                Retry Generation
+              </button>
+            </div>
+          ) : menuResult ? (
             <div className="animate-in fade-in slide-in-from-right duration-500">
               <div className="mb-8">
                 <span className="text-amber-600 font-bold tracking-[0.2em] uppercase text-xs">AI Suggestion</span>
                 <h4 className="text-3xl font-bold serif mt-2">{formData.eventType} Concept</h4>
-                <p className="text-stone-500 italic mt-4 font-light">"{menuResult.concept}"</p>
+                <p className="text-stone-500 italic mt-4 font-light leading-relaxed">"{menuResult.concept}"</p>
               </div>
 
               <div className="space-y-8">
@@ -219,7 +250,7 @@ const BookingForm: React.FC = () => {
           )}
 
           {/* Decorative background element */}
-          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-amber-100/30 rounded-full blur-3xl -z-10"></div>
+          <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-amber-100/20 rounded-full blur-3xl pointer-events-none"></div>
         </div>
       </div>
     </div>
