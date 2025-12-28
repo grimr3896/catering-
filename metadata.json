@@ -1,0 +1,7 @@
+{
+  "name": "Lumière Elite Catering",
+  "description": "A premium catering experience featuring AI-powered menu planning, elegant galleries, and seamless booking for corporate and private events.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
